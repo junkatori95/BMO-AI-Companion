@@ -1,82 +1,110 @@
+# BMO-AI-Companion 📟
 
+BMO is a multi-modal AI assistant powered by a Raspberry Pi 5. It uses Ollama for high-level reasoning and vision, paired with a custom security patrol mode and facial recognition.
 
-📟 BMO: The Raspberry Pi AI Companion
-BMO is a multi-functional, privacy-focused AI companion designed to run locally on a Raspberry Pi 5. It combines LLM-based conversation, computer vision for security, and hardware monitoring into a single child-like personality (inspired by Adventure Time).
-✨ Key Features
-🤖 Local-First AI: Uses Ollama (Llama 3.2 & Moondream) to chat and describe surroundings without sending data to the cloud.
-🛡️ Face-ID Security: Recognizes the owner and enters an "Intruder Alert" mode if a stranger is detected.
-📸 Vision: Describe what BMO sees in real-time using the Pi Camera.
-🌡️ System Health: Check your Pi's CPU temperature, RAM usage, and vitals via Telegram.
-🌐 Bilingual: Native support for English and Vietnamese.
-🎨 Modular Personality: Easily swap between a "child-like," "professional," or "sarcastic" BMO via the config file.
+## ✨ Features
+* **Vision:** Uses `Moondream` to describe surroundings and identify objects via the Pi Camera.
+* **Chat:** Powered by `Llama 3.2 3b` for a witty, child-like personality.
+* **Security:** Face recognition identifies authorized users (admin) or sounds an intruder alert.
+* **Bilingual:** Toggle between English and Vietnamese seamlessly.
+* **System Monitor:** Real-time tracking of Pi 5 temperature, CPU, and RAM usage.
 
-🛠️ Prerequisites
-Hardware: Raspberry Pi 5 (Recommended) or Pi 4 (8GB), Camera Module (v2 or v3).
-Ollama: Must be installed and running on your Pi.
-ollama pull llama3.2:3b
-ollama pull moondream
-Libraries: libcamera and python3-picamera2 installed via apt.
+## 🛠️ Hardware Requirements
+* Raspberry Pi 5 (8GB recommended)
+* Raspberry Pi Camera Module (v3 or compatible)
+* Active Cooling (Fan) is highly recommended for AI workloads
 
-🚀 Installation
-1. Clone the Repository
-Bash
-git clone https://github.com/YOUR_USERNAME/BMO-AI-Companion.git
-cd BMO-AI-Companion
+## ⚙️ Installation & Setup
 
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/YOUR_USERNAME/BMO-AI-Companion.git](https://github.com/YOUR_USERNAME/BMO-AI-Companion.git)
+   cd BMO-AI-Companion
 
-2. Set Up the Hybrid Environment
-Since this project interacts with physical hardware, we use a virtual environment that bridges to system-site packages to access the camera drivers.
-Bash
-# Create the bridge environment
-python -m venv --system-site-packages venv
+```
 
-# Activate it
+2. **Create a Virtual Environment:**
+```bash
+python -m venv venv
 source venv/bin/activate
 
-# Install high-level dependencies
-pip install python-telegram-bot ollama python-dotenv face_recognition psutil
+```
 
 
-3. Configuration (The "Secrets")
-Rename .env.example to .env.
-Add your Telegram Bot Token and Admin Chat ID (use @userinfobot on Telegram to find yours).
-Add a photo of yourself named admin.jpg in the root folder for face recognition.
+3. **Configure Environment Variables:**
+Create a `.env` file in the root directory to store your secrets safely:
+```text
+TELEGRAM_TOKEN=your_bot_token_here
+ADMIN_ID=your_telegram_user_id
 
-⚙️ Customization
-BMO’s soul lives in config.py. You can change the SYSTEM_PROMPT to redefine his personality without touching the core logic:
-Python
-# config.py example
-SYSTEM_PROMPT = "You are BMO. You are playful, imaginative, and speak in short, cute sentences."
+```
 
 
+4. **Add Authorized Face:**
+Place a clear photo of your face named `admin.jpg` in the root folder for the security module.
 
-📟 Telegram Commands
-Command
-Description
-/start
-Wake up BMO.
-/look
-BMO uses the camera to describe the room.
-/patrol
-Starts security mode (Face-ID).
-/status
-Shows Pi CPU Temp and RAM.
-/language
-Toggle between English/Vietnamese.
-/joke
-BMO tells a tech-themed joke.
-/reset
-Clear BMO's short-term memory.
+## ⚠️ Troubleshooting (Raspberry Pi 5 Specifics)
 
+### 1. The `dlib` / `face_recognition` Installation
 
-🛡️ Security Note
-This project uses a .env file to store sensitive credentials. Never commit your .env file to GitHub. The .gitignore included in this repo is pre-configured to keep your tokens safe.
+Installing `face_recognition` on a Pi 5 requires compiling `dlib`, which is resource-heavy. If the installation crashes or hangs:
 
-🤝 Contributing
-Feel free to fork this project! If you have ideas for new BMO "apps" or personality modules, please submit a Pull Request.
+**Solution:** Install system dependencies first, then use the low-memory flag:
 
-📜 License
-MIT License - See LICENSE for details.
+```bash
+sudo apt update
+sudo apt install -y cmake build-essential libopenblas-dev liblapack-dev libjpeg-dev
+pip install --no-cache-dir dlib
+pip install face_recognition
 
+```
+
+### 2. `ValueError: numpy.dtype size changed`
+
+This occurs due to a conflict between Numpy 2.0 and the Raspberry Pi's `picamera2` drivers.
+
+**Solution:** Force a stable Numpy 1.x version:
+
+```bash
+pip uninstall -y numpy
+pip install "numpy<2"
+
+```
+
+### 3. Missing Dependencies
+
+Install the remaining BMO tools:
+
+```bash
+pip install python-telegram-bot python-dotenv ollama opencv-python-headless psutil
+
+```
+
+## 🚀 Running BMO
+
+Ensure your virtual environment is active and run:
+
+```bash
+python bmo.py
+
+```
+
+## 🛡️ Security Note
+
+The `.env` file and `admin.jpg` are listed in the `.gitignore` to prevent your private credentials and biometric data from being published to GitHub. **Never share your `.env` file.**
+
+```
+
+---
+
+### Final Check for GitHub
+Before you push, ensure your `.gitignore` file contains these lines to match the README's security promise:
+
+```text
+.env
+venv/
+__pycache__/
+*.jpg
+*.png
 
 
