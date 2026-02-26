@@ -1,0 +1,7 @@
+python-dotenv
+python-telegram-bot
+ollama
+face_recognition
+psutil
+numpy<2
+opencv-python-headless
